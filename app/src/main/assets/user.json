@@ -1,0 +1,30 @@
+[
+  {
+    "userId": 0,
+    "firstName": "Jean",
+    "lastName": "Tuche",
+    "emailUser": "jean.tuche@gmail.com",
+    "isVisible": true
+  },
+  {
+    "userId": 1,
+    "firstName": "Bertrand",
+    "lastName": "Tuche",
+    "emailUser": "jean.tuche@gmail.com",
+    "isVisible": true
+  },
+  {
+    "userId": 2,
+    "firstName": "Jeannine",
+    "lastName": "Tuche",
+    "emailUser": "jean.tuche@gmail.com",
+    "isVisible": true
+  },
+  {
+    "userId": 3,
+    "firstName": "Rachid",
+    "lastName": "Tuche",
+    "emailUser": "jean.tuche@gmail.com",
+    "isVisible": true
+  }
+]

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">PlayUser</string>
+    <string name="add_user_title">ADD USER</string>
+    <string name="user_list_title">USER LIS</string>
+    <string name="profile">PROFILE</string>
+    <string name="friends_list">LIST</string>
+
+    <string name="firstName">First Name</string>
+    <string name="lastName">Last Name</string>
+    <string name="email">Email</string>
+    <string name="register">Register</string>
+</resources>
