@@ -9,7 +9,7 @@ interface UserDao {
     fun getUsers(): Flow<List<User>>
 
     @Query("SELECT * FROM user WHERE id = :idUser")
-    fun getUser(idUser: String): Flow<List<User>>
+    fun getUser(idUser: String): Flow<User>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(RegisterUser: List<User>)

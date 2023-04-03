@@ -10,3 +10,11 @@ data class UIState(
     val hasEmailError: Boolean = false,
 
     )
+
+enum class Status {
+    LOADING,
+    SUCCESS,
+    ERROR,
+    EDIT,
+    REMOVE
+}

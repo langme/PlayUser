@@ -8,12 +8,12 @@ import com.example.playuser.data.User
 
 @Composable
 fun PlayUserApp(
-    onUserClick: (User) -> Unit,
+    onUserClick: (User) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     UserListScreen(
+        onUserClick = onUserClick,
         modifier = modifier.fillMaxSize(),
-        onUserClick = onUserClick
     )
 }
 

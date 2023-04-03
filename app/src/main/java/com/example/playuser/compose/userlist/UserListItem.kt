@@ -3,12 +3,14 @@ package com.example.playuser.compose.userlist
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,29 +20,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.example.playuser.R
 import com.example.playuser.data.User
 
-@Composable
-fun UserListItem(user: User, onClick: () -> Unit) {
-    ImageListItem(user = user, onClick = onClick)
-}
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImageListItem(user: User, onClick: () -> Unit) {
+fun UserItem(
+    user: User,
+    onEditClick : (User) -> Unit,
+    onRemoveClick: (User) -> Unit
+) {
     Card(
         modifier = Modifier
             .padding(horizontal = 12.dp)
             .padding(bottom = 12.dp),
         shape = MaterialTheme.shapes.small,
-        onClick = onClick,
     ) {
 
         Row(Modifier.height(60.dp)) {
             IconProfile(Modifier.weight(1f))
             InfoProfile(Modifier.weight(3f), user)
-            EditProfile(Modifier.weight(1f))
+            EditProfile(user, Modifier.weight(1f),
+                onEditClicked = {
+                    onEditClick(user)
+                })
+            DeleteProfile(user, Modifier.weight(1f),
+                onRemoveClicked = {
+                onRemoveClick(user)
+            })
         }
         Divider(
             thickness = 2.dp,
@@ -50,15 +57,17 @@ fun ImageListItem(user: User, onClick: () -> Unit) {
 }
 
 @Composable
-fun IconProfile(modifier: Modifier = Modifier){
+fun IconProfile(
+    modifier: Modifier = Modifier,
+){
     Box(modifier){
         Icon(
-            Icons.Filled.Person,
-            contentDescription = "person",
-            tint = MaterialTheme.colorScheme.primary,
+            imageVector = Icons.Filled.Person,
+            contentDescription = stringResource(id = R.string.profile),
             modifier = Modifier
                 .padding(7.dp)
-                .size(46.dp)
+                .size(46.dp),
+            tint = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -110,16 +119,52 @@ fun InfoProfile(modifier: Modifier = Modifier, user: User){
 }
 
 @Composable
-fun EditProfile(modifier: Modifier = Modifier){
+fun EditProfile(
+    user: User,
+    modifier: Modifier = Modifier,
+    onEditClicked: (user :User) -> Unit
+){
     Box(modifier){
-        Icon(
-            Icons.Filled.Edit,
-            contentDescription = "person",
-            tint = MaterialTheme.colorScheme.primary,
+        IconButton(
+            onClick = {
+                onEditClicked(user)
+            },
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary),
             modifier = Modifier
                 .padding(7.dp)
                 .size(46.dp)
-        )
+        ){
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = "Edit ${user.userId}"
+            )
+        }
+    }
+}
+
+@Composable
+fun DeleteProfile(
+    user: User,
+    modifier: Modifier = Modifier,
+    onRemoveClicked: (user: User) -> Unit
+){
+    Box(modifier){
+        IconButton(
+            onClick = {
+                      onRemoveClicked(user)
+                      },
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary),
+            modifier = Modifier
+                .padding(7.dp)
+                .size(46.dp)
+        ){
+            Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = "Remove ${user.userId}"
+            )
+        }
     }
 }
 
@@ -128,7 +173,7 @@ fun EditProfile(modifier: Modifier = Modifier){
 fun  ImageListItemPreview(
     @PreviewParameter(UserPreviewParamProvider::class) user: User)
 {
-    ImageListItem(user = user){}
+    UserItem(user = user , onEditClick = {}, onRemoveClick = {})
 }
 
 private class UserPreviewParamProvider : PreviewParameterProvider<User> {

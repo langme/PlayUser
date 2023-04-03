@@ -12,16 +12,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavDeepLink
+import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
-import androidx.navigation.navigation
 import com.example.playuser.compose.PlayUserApp
 import com.example.playuser.compose.adduser.RegisterScreen
+import com.example.playuser.compose.userdetail.UserDetailsScreen
 import com.example.playuser.ui.theme.PlayUserTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,15 +39,17 @@ class UserActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyBottomAppBar(){
+fun MyBottomAppBar(
+){
 
     val tabItems = listOf("List", "Add")
     val selectedItem = remember { mutableStateOf(0) }
+
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val parentRouteName = navBackStackEntry.value?.destination?.parent?.route
     // todo yet implemented
-    //val routeName = navBackStackEntry.value?.destination?.route
+   // val routeName = navBackStackEntry.value?.destination?.route
 
     Scaffold(
         topBar = {
@@ -69,18 +70,18 @@ fun MyBottomAppBar(){
                             restoreState = true
 
                         })
-
-
                     },
                     icon = {
                         when (item) {
                             "List" -> Icon(
                                 painter = painterResource(id = R.drawable.baseline_list_24),
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary
                             )
                             "Add"-> Icon(
                                 painter = painterResource(id = R.drawable.baseline_add_reaction_24),
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary
                             )
                         }
 
@@ -95,14 +96,30 @@ fun MyBottomAppBar(){
             NavHost(navController = navController, startDestination = "List") {
                 navigation(startDestination = "ListPage", route = "List") {
                     composable("ListPage", deepLinks = listOf(NavDeepLink("deeplink://home"))) {
-                        PlayUserApp(onUserClick ={})
+                        PlayUserApp(
+                            onUserClick = {
+                                navController.navigate("UserDetail/${it.userId}")
+                            }
+                        )
+                    }
+
+                    composable(
+                        "userDetail/{userId}",
+                        arguments = listOf(navArgument("userId") {
+                            type = NavType.StringType
+                        })
+                    ) {
+                        UserDetailsScreen(
+                            onBackClick = {
+                                navController.navigateUp()
+                            },
+                        )
                     }
                 }
-
                 navigation(startDestination = "AddPage", route = "Add") {
                     composable(
                         "AddPage",
-                        deepLinks = listOf(NavDeepLink("deeplink://product"))
+                        deepLinks = listOf(NavDeepLink("deeplink://add"))
                     ) {
                         RegisterScreen()
                     }
