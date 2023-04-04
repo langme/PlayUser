@@ -96,6 +96,7 @@ fun MyBottomAppBar(
             NavHost(navController = navController, startDestination = "List") {
                 navigation(startDestination = "ListPage", route = "List") {
                     composable("ListPage", deepLinks = listOf(NavDeepLink("deeplink://home"))) {
+
                         PlayUserApp(
                             onUserClick = {
                                 navController.navigate("UserDetail/${it.userId}")

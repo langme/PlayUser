@@ -3,11 +3,10 @@ package com.example.playuser.compose.userlist
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -28,7 +27,9 @@ import com.example.playuser.data.User
 fun UserItem(
     user: User,
     onEditClick : (User) -> Unit,
-    onRemoveClick: (User) -> Unit
+    onRemoveClick: (User) -> Unit,
+    onUpCount : (User) -> Unit,
+    onDownCount : (User) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -37,9 +38,17 @@ fun UserItem(
         shape = MaterialTheme.shapes.small,
     ) {
 
-        Row(Modifier.height(60.dp)) {
+        Row(Modifier.height(80.dp)) {
             IconProfile(Modifier.weight(1f))
             InfoProfile(Modifier.weight(3f), user)
+            CountProfile(user, Modifier.weight(1f),
+                onUpCount = {
+                    onUpCount(user)
+                },
+                onDownCount = {
+                    onDownCount(user)
+                }
+            )
             EditProfile(user, Modifier.weight(1f),
                 onEditClicked = {
                     onEditClick(user)
@@ -80,7 +89,7 @@ fun InfoProfile(modifier: Modifier = Modifier, user: User){
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
-            val (firstText, secondText, thirdText) = createRefs()
+            val (firstText, secondText, thirdText, quatoText) = createRefs()
             Text(
                 modifier = Modifier.constrainAs(firstText) {
                     top.linkTo(parent.top,)
@@ -92,7 +101,6 @@ fun InfoProfile(modifier: Modifier = Modifier, user: User){
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Start,
             )
-
             Text(
                 modifier = Modifier.constrainAs(secondText) {
                     top.linkTo(firstText.bottom)
@@ -103,7 +111,6 @@ fun InfoProfile(modifier: Modifier = Modifier, user: User){
                 textAlign = TextAlign.Start,
                 fontSize = 14.sp
             )
-
             Text(
                 modifier = Modifier.constrainAs(thirdText) {
                     top.linkTo(secondText.bottom,)
@@ -111,6 +118,16 @@ fun InfoProfile(modifier: Modifier = Modifier, user: User){
                     width = Dimension.fillToConstraints
                 },
                 text = user.emailUser,
+                textAlign = TextAlign.Start,
+                fontSize = 12.sp
+            )
+            Text(
+                modifier = Modifier.constrainAs(quatoText) {
+                    top.linkTo(thirdText.bottom,)
+                    start.linkTo(parent.start,margin = 10.dp)
+                    width = Dimension.fillToConstraints
+                },
+                text = user.count.toString(),
                 textAlign = TextAlign.Start,
                 fontSize = 12.sp
             )
@@ -139,6 +156,57 @@ fun EditProfile(
                 imageVector = Icons.Filled.Edit,
                 contentDescription = "Edit ${user.userId}"
             )
+        }
+    }
+}
+
+@Composable
+fun CountProfile(
+    user: User,
+    modifier: Modifier = Modifier,
+    onUpCount: (user :User) -> Unit,
+    onDownCount: (user :User) -> Unit
+){
+    Box(){
+        Column() {
+            Row(modifier = Modifier
+                .padding(2.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically){
+                IconButton(
+                    onClick = {
+                        onUpCount(user)
+                    },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier
+                        .size(28.dp),
+                ){
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropUp,
+                        contentDescription = "count UP ${user.userId}"
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.padding(2.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically){
+                IconButton(
+                    onClick = {
+                        onDownCount(user)
+                    },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier
+                        .size(28.dp),
+                ){
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = "Count Down ${user.userId}"
+                    )
+                }
+            }
         }
     }
 }
@@ -173,7 +241,25 @@ fun DeleteProfile(
 fun  ImageListItemPreview(
     @PreviewParameter(UserPreviewParamProvider::class) user: User)
 {
-    UserItem(user = user , onEditClick = {}, onRemoveClick = {})
+    UserItem(
+        user = user,
+        onEditClick = {},
+        onRemoveClick = {},
+        onUpCount = {},
+        onDownCount = {}
+    )
+}
+
+@Preview
+@Composable
+fun CountProfilePreview(
+    @PreviewParameter(UserPreviewParamProvider::class) user: User)
+{
+    CountProfile(
+        user = user,
+        onUpCount = {},
+        onDownCount = {}
+    )
 }
 
 private class UserPreviewParamProvider : PreviewParameterProvider<User> {

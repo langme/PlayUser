@@ -1,9 +1,7 @@
 package com.example.playuser.data
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -12,8 +10,14 @@ import com.example.playuser.utilities.DATABASE_NAME
 import com.example.playuser.utilities.USER_DATA_FILENAME
 import com.example.playuser.workers.SeedDatabaseWorker
 
-@Database(entities = [User::class], version = 1, exportSchema = false)
+@Database(
+    version = 1,
+    entities = [User::class],
+    //autoMigrations = [AutoMigration (from = 1, to = 2, spec = AppDatabase.MyAutoMigration::class)],
+    exportSchema = true)
 abstract class AppDatabase: RoomDatabase() {
+    /*@RenameTable(fromTableName = "user", toTableName = "AppUser")
+    class MyAutoMigration : AutoMigrationSpec*/
     abstract fun UserDao(): UserDao
 
     companion object {
@@ -29,6 +33,8 @@ abstract class AppDatabase: RoomDatabase() {
 
         private fun buildDatabase(context: Context): AppDatabase {
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
+                .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
                 .addCallback(
                     object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {

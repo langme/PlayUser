@@ -9,8 +9,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -22,6 +21,10 @@ import com.example.playuser.data.User
 import com.example.playuser.viewmodels.UserListViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.playuser.viewmodels.UserListViewEvent
+import kotlinx.coroutines.delay
+import com.example.playuser.pullrefresh.PullRefreshIndicator
+import com.example.playuser.pullrefresh.pullRefresh
+import com.example.playuser.pullrefresh.rememberPullRefreshState
 
 @Composable
 fun UserListScreen(
@@ -30,37 +33,54 @@ fun UserListScreen(
     viewModel: UserListViewModel = hiltViewModel(),
 ) {
     val viewState = viewModel.consumableState().collectAsState()
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(1),
-        modifier = modifier
-            .testTag("user_list")
-            .background(color = MaterialTheme.colorScheme.background,),
-        contentPadding = PaddingValues(
-            horizontal = 12.dp,
-            vertical = 12.dp
-        )
-    ){
-        items(
-            items = viewState.value.users,
-            key = { item -> item.userId }
-        ) { user ->
-            UserItem(
-                user = user,
-                onEditClick = {
-                    viewModel.handleViewEvent(UserListViewEvent.EditItem(user))
-                    onUserClick(user)
-                    Log.d("", "Edit ${user.userId}")
-                },
-                onRemoveClick = {
-                    viewModel.handleViewEvent(UserListViewEvent.RemoveItem(user))
-                    Log.d("", "Remove ${user.userId}")
-                })
+    val refreshing by viewModel.isRefreshing.collectAsState()
+    val pullRefreshState = rememberPullRefreshState(refreshing, { viewModel.refresh() })
+    Box(Modifier.pullRefresh(pullRefreshState)) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            modifier = modifier
+                .testTag("user_list")
+                .background(color = MaterialTheme.colorScheme.background,),
+            contentPadding = PaddingValues(
+                horizontal = 12.dp,
+                vertical = 12.dp
+            )
+        ) {
+            items(
+                items = viewState.value.users,
+                key = { item -> item.userId }
+            ) { user ->
+                UserItem(
+                    user = user,
+                    onEditClick = {
+                        viewModel.handleViewEvent(UserListViewEvent.EditItem(user))
+                        onUserClick(user)
+                        Log.d("", "Edit ${user.userId}")
+                    },
+                    onRemoveClick = {
+                        viewModel.handleViewEvent(UserListViewEvent.RemoveItem(user))
+                        Log.d("", "Remove ${user.userId}")
+                    },
+                    onUpCount = {
+                        Log.d("", "BEFORE : ID ${user.userId} : Count ${user.count}")
+                        viewModel.handleViewEvent(UserListViewEvent.UpCount(user))
+                        Log.d("", "AFTER : ID ${user.userId} : Count ${user.count}")
+                    },
+                    onDownCount = {
+                        Log.d("", "BEFORE : ID ${user.userId} : Count ${user.count}")
+                        viewModel.handleViewEvent(UserListViewEvent.DownCount(user))
+                        Log.d("", "AFTER : ID ${user.userId} : Count ${user.count}")
+                    },
+                )
+            }
         }
-    }
 
-    if (viewState.value.isLoading){
-        LoadingIndicator()
+        PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
+
+
+        if (viewState.value.isLoading) {
+            LoadingIndicator()
+        }
     }
 }
 
@@ -78,32 +98,52 @@ fun UserListScreen(
     modifier: Modifier = Modifier,
     viewModel: UserListViewModel = hiltViewModel(),
 ) {
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(1),
-        modifier = modifier
-            .testTag("user_list")
-            .background(color = MaterialTheme.colorScheme.background,),
-        contentPadding = PaddingValues(
-            horizontal = 12.dp,
-            vertical = 12.dp
-        )
-    ) {
-        items(
-            items = users,
-            key = { it.userId }
-        ) { user ->
-            // know if you display Edit / delete profile
-            UserItem(
-                user = user,
-                onEditClick = {
-                    viewModel.handleViewEvent(UserListViewEvent.EditItem(user))
-                },
-                onRemoveClick = {
-                    viewModel.handleViewEvent(UserListViewEvent.RemoveItem(user))
-                })
+    var refreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            delay(2000)
+            refreshing = false
         }
     }
+
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            modifier = modifier
+                .testTag("user_list")
+                .background(color = MaterialTheme.colorScheme.background,),
+            contentPadding = PaddingValues(
+                horizontal = 12.dp,
+                vertical = 12.dp
+            )
+        ) {
+            items(
+                items = users,
+                key = { it.userId }
+            ) { user ->
+                // know if you display Edit / delete profile
+                UserItem(
+                    user = user,
+                    onEditClick = {
+                        viewModel.handleViewEvent(UserListViewEvent.EditItem(user))
+                    },
+                    onRemoveClick = {
+                        viewModel.handleViewEvent(UserListViewEvent.RemoveItem(user))
+                        Log.d("", "Delete user : ID ${user.userId}")
+                    },
+                    onUpCount = {
+                        Log.d("", "BEFORE : ID ${user.userId} : Count ${user.count}")
+                        viewModel.handleViewEvent(UserListViewEvent.UpCount(user))
+                        Log.d("", "AFTER : ID ${user.userId} : Count ${user.count}")
+                    },
+                    onDownCount = {
+                        Log.d("", "BEFORE : ID ${user.userId} : Count ${user.count}")
+                        viewModel.handleViewEvent(UserListViewEvent.DownCount(user))
+                        Log.d("", "AFTER : ID ${user.userId} : Count ${user.count}")
+                    },
+                )
+            }
+        }
 }
 
 @Preview

@@ -43,6 +43,6 @@ class SeedDatabaseWorker(
 
     companion object {
         private const val TAG = "SeedDatabaseWorker"
-        const val KEY_FILENAME = "PLANT_DATA_FILENAME"
+        const val KEY_FILENAME = "USER_DATA_FILENAME"
     }
 }

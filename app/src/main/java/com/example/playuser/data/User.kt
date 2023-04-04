@@ -18,7 +18,9 @@ data class User (
     @ColumnInfo(name = "emailUser")
     var emailUser: String ="",
     @ColumnInfo(name = "isvisible")
-    var isVisible: Boolean = true
+    var isVisible: Boolean = true,
+    @ColumnInfo(name = "count")
+    var count: Int = 0
 ){
     constructor(firstName: String, lastName: String, email: String) : this(firstName =  firstName, lastName = lastName, emailUser = email)
 }

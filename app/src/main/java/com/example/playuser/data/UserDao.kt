@@ -2,6 +2,7 @@ package com.example.playuser.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import androidx.room.OnConflictStrategy.Companion.IGNORE
 
 @Dao
 interface UserDao {
@@ -14,7 +15,7 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(RegisterUser: List<User>)
 
-    @Insert
+    @Insert(onConflict = IGNORE)
     suspend fun insert(item: User)
 
     @Update
